@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Urbanist", sans-serif;
+        }
+
+        html {
+            color: #fff;
+            font-size: 62.5%;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 100px;
+            background-color: #1b1b1d;
+        }
+
+        li {
+            cursor: pointer;
+            list-style-type: circle;
+            margin: 2rem 0;
+            text-transform: capitalize;
+            font-weight: 500;
+
+            &:hover {
+                color: #feac5e;
+            }
+        }
+
+        .main_todo_div {
+            width: 36rem;
+            display: grid;
+            grid-template-columns: 1fr 0.3fr;
+            align-items: center;
+            height: auto;
+        }
+
+        button {
+            height: 5rem;
+
+        }
+
+        h1 {
+            margin-bottom: 3.2rem;
+            margin-right: 13%;
+
+        }
+
+        p,
+        li,
+        button {
+            font-size: 1.7rem;
+            letter-spacing: 0.1rem;
+            font-family: "Urbanist", sans-serif;
+            line-height: 1.6;
+        }
+
+        button {
+            background-color: #f5ee62;
+            padding: 0.6rem 2.4rem;
+            border-radius: 10rem;
+            margin-right: 3.6rem;
+            cursor: pointer;
+            transition: all 0.3s linear;
+
+            &:hover {
+                box-shadow: inset 0 0 0 0.2rem #f5ee62;
+                background-color: transparent;
+                color: #f5ee62;
+            }
+
+        }
+
+        input {
+            padding: 6px 2px;
+            min-width: 32rem;
+            font-size: 18px;
+            border-radius: 0.6rem;
+            border: none;
+            margin-right: 1.2rem;
+        }
+
+        li:hover+.deleteBtn {
+            box-shadow: inset 0 0 0 0.2rem #f5ee62;
+            background-color: transparent;
+            color: #f5ee62;
+        }
+ 
+
+        @media only screen and (max-width:600px){
+            input{
+                width: 25%;
+                margin: 10px;
+            }
+            button.btn{
+                 align-items: center;
+                 display: flex;
+                 height: 5rem;
+                 margin-left: 30%;
+            }
+            li{
+                margin: 24px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Todo List</h1>
+    <br>
+    <form>
+        <div>
+            <input type="text" id="inputValue">
+            <button class="btn">Add Todo</button>
+        </div>
+        <section class="todo-lists-elem">
+
+        </section>
+    </form>
+
+    <script>
+        const mainTodoElem = document.querySelector(".todo-lists-elem");
+        const inputValue = document.getElementById("inputValue");
+
+
+        const getTodolistFromLocal = () => {
+            return JSON.parse(localStorage.getItem("youtubeTodolist"));
+        };
+
+        const addTodolistLocalStorage = (localTodolist) => {
+            return localStorage.setItem('youtubeTodolist', JSON.stringify(localTodolist));
+        }
+        localTodolist = getTodolistFromLocal() || [];
+
+        const addTodoDynamicElement = (curElem) => {
+            const divElement = document.createElement("div");
+            divElement.classList.add("main_todo_div");
+            divElement.innerHTML = `<li>${curElem}</li> <button class="deleteBtn">Delete</button>`;
+            mainTodoElem.append(divElement);
+
+
+
+        };
+
+        const addTodoList = (e) => {
+            e.preventDefault();
+
+            const todoListValue = inputValue.value.trim();
+            inputValue.value = "";
+
+            if (todoListValue !== "" && !localTodolist.includes(todoListValue)) {
+
+                localTodolist.push(todoListValue);
+                localTodolist = [...new Set(localTodolist)];
+                console.log(localTodolist);
+                localStorage.setItem('youtubeTodolist', JSON.stringify(localTodolist));
+
+                addTodoDynamicElement(todoListValue);
+            }
+
+        };
+
+        const showTodolist = () => {
+            console.log(localTodolist);
+
+            localTodolist.forEach((curElem) => {
+                addTodoDynamicElement(curElem);
+            });
+        }
+        showTodolist();
+
+        const removeTodoElem = (e) => {
+
+            const todoRemove = e.target;
+            let todoContent = todoRemove.previousElementSibling.innerText;
+            let parentElem = todoRemove.parentElement;
+            console.log(todoContent);
+
+            localTodolist = localTodolist.filter((curTodo) => {
+                return curTodo !== todoContent.toLowerCase();
+            });
+
+            addTodolistLocalStorage(localTodolist);
+            parentElem.remove();
+            console.log(localTodolist);
+        };
+
+        mainTodoElem.addEventListener('click', (e) => {
+            e.preventDefault();
+            removeTodoElem(e);
+
+        })
+
+        document.querySelector(".btn").addEventListener("click", (e) => {
+            addTodoList(e);
+        });
+
+
+    </script>
+</body>
+
+</html>
